@@ -1,0 +1,6 @@
+.git
+openspec
+pb
+*.pdf
+e2e-test
+node_modules

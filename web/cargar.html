@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij48cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IiNmNzk0MWQiLz48dGV4dCB4PSIyIiB5PSIxNCIgZm9udC1zaXplPSIxMSIgZmlsbD0iI2ZmZiI+UjwvdGV4dD48L3N2Zz4K">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cargar ficha — Relevamiento Taxis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.26.1/dist/pocketbase.umd.js" integrity="sha384-hY70gu8Te3sbIOcK/QdlA5ZS1N4wNtUY72G/FvV4hDP9GKsnyBnyo3xd7B12eV6t" crossorigin="anonymous"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="cargar.html">
+        <span class="brand-mark">RT</span>
+        <span>Relevamiento Taxis<span class="brand-sub">Gestión de asistencia</span></span>
+      </a>
+      <nav class="mainnav">
+        <a href="cargar.html" aria-current="page">Cargar</a>
+        <a href="tabla.html">Tabla</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#" id="logout" class="nav-logout">Salir</a>
+      </nav>
+    </div>
+  </header>
+
+  <ol class="stepper" aria-label="Secciones del formulario">
+    <li><a href="#sec1">Datos personales</a></li>
+    <li><a href="#sec2">Hogar</a></li>
+    <li><a href="#sec3">Laboral</a></li>
+    <li><a href="#sec4">Urgencia</a></li>
+    <li><a href="#sec5">Asistencia</a></li>
+  </ol>
+
+  <main>
+    <div class="pageintro">
+      <h1>Cargar ficha</h1>
+      <p><small class="confdense">Datos confidenciales. Uso exclusivo para gestión de asistencia.</small></p>
+    </div>
+
+    <div class="error-summary" id="errorSummary" role="alert" hidden>
+      <strong>Corrija los siguientes errores:</strong>
+      <ul id="errorSummaryList"></ul>
+    </div>
+    <p class="error" id="formError" role="alert"></p>
+    <p id="formOk" role="status"></p>
+    <p id="dupWarn" class="warn" hidden>DNI ya registrado. <a id="editExisting" href="#">Editar existente</a></p>
+
+    <form id="fichaForm" novalidate>
+      <!-- Datos personales y del servicio -->
+      <fieldset id="sec1" class="card">
+        <legend>Datos personales y del servicio</legend>
+
+        <label for="dni">DNI (7–8 dígitos)</label>
+        <input id="dni" name="dni" inputmode="numeric" pattern="\d{7,8}" required maxlength="8" data-mask="dni">
+        <p class="field-error" id="err_dni" role="alert" hidden></p>
+        <p>
+          <button type="button" id="btnPersonas">Buscar en padrón</button>
+          <span class="badge" id="badgeOrigen" hidden>Datos del padrón</span>
+        </p>
+        <p id="personasNotice" role="status"></p>
+
+        <label for="apellido_nombre">Apellido y nombre</label>
+        <input id="apellido_nombre" name="apellido_nombre" required>
+        <p class="field-error" id="err_apellido_nombre" role="alert" hidden></p>
+
+        <label for="tel_whatsapp">Tel / WhatsApp</label>
+        <input id="tel_whatsapp" name="tel_whatsapp" required data-mask="phone">
+        <p class="field-error" id="err_tel_whatsapp" role="alert" hidden></p>
+
+        <label for="edad">Edad (18–100)</label>
+        <input id="edad" name="edad" type="number" min="18" max="100" required data-mask="digits" data-max="3">
+        <p class="field-error" id="err_edad" role="alert" hidden></p>
+
+        <label for="localidad">Localidad</label>
+        <input id="localidad" name="localidad" required>
+        <p class="field-error" id="err_localidad" role="alert" hidden></p>
+
+        <label for="barrio">Barrio</label>
+        <input id="barrio" name="barrio" required>
+        <p class="field-error" id="err_barrio" role="alert" hidden></p>
+
+        <label for="tipo_servicio">Tipo de servicio</label>
+        <select id="tipo_servicio" name="tipo_servicio" required>
+          <option value="">—</option>
+          <option value="taxi">Taxi</option>
+          <option value="remis">Remis</option>
+          <option value="app">App</option>
+          <option value="otro">Otro</option>
+        </select>
+        <p class="field-error" id="err_tipo_servicio" role="alert" hidden></p>
+        <div id="wrap_tipo_servicio_otro" hidden>
+          <label for="tipo_servicio_otro">Especifique otro servicio</label>
+          <input id="tipo_servicio_otro" name="tipo_servicio_otro">
+          <p class="field-error" id="err_tipo_servicio_otro" role="alert" hidden></p>
+        </div>
+
+        <label for="vehiculo">Vehículo</label>
+        <select id="vehiculo" name="vehiculo" required>
+          <option value="">—</option>
+          <option value="propio">Propio</option>
+          <option value="alquila">Alquila</option>
+          <option value="chofer">Chofer</option>
+        </select>
+        <p class="field-error" id="err_vehiculo" role="alert" hidden></p>
+
+        <label for="antiguedad_anios">Antigüedad (años, ≥ 0)</label>
+        <input id="antiguedad_anios" name="antiguedad_anios" type="number" min="0" required data-mask="digits" data-max="2">
+        <p class="field-error" id="err_antiguedad_anios" role="alert" hidden></p>
+      </fieldset>
+
+      <!-- Situación del hogar -->
+      <fieldset id="sec2" class="card">
+        <legend>Situación del hogar</legend>
+
+        <label for="convivientes_total">Convivientes total (0 si vivís solo)</label>
+        <input id="convivientes_total" name="convivientes_total" type="number" min="0" required data-mask="digits" data-max="3">
+        <p class="field-error" id="err_convivientes_total" role="alert" hidden></p>
+
+        <label for="menores_18">Menores de 18 (0 ≤ x ≤ total)</label>
+        <input id="menores_18" name="menores_18" type="number" min="0" required data-mask="digits" data-max="3">
+        <p class="field-error" id="err_menores_18" role="alert" hidden></p>
+
+        <p>Único sostén</p>
+        <label class="choice"><input type="radio" name="unico_sosten" value="true" required> Sí</label>
+        <label class="choice"><input type="radio" name="unico_sosten" value="false"> No</label>
+        <p class="field-error" id="err_unico_sosten" role="alert" hidden></p>
+
+        <p>Tiene beneficio (CUD / jubilación / AUH)</p>
+        <label class="choice"><input type="radio" name="tiene_beneficio" value="true" required> Sí</label>
+        <label class="choice"><input type="radio" name="tiene_beneficio" value="false"> No</label>
+        <p class="field-error" id="err_tiene_beneficio" role="alert" hidden></p>
+        <div id="wrap_beneficio_quien" hidden>
+          <label for="beneficio_quien">¿Quién recibe el beneficio?</label>
+          <input id="beneficio_quien" name="beneficio_quien">
+          <p class="field-error" id="err_beneficio_quien" role="alert" hidden></p>
+        </div>
+
+        <label for="tipo_vivienda">Tipo de vivienda</label>
+        <select id="tipo_vivienda" name="tipo_vivienda" required>
+          <option value="">—</option>
+          <option value="propia">Propia</option>
+          <option value="alquilada">Alquilada</option>
+          <option value="prestada">Prestada</option>
+          <option value="otra">Otra</option>
+        </select>
+        <p class="field-error" id="err_tipo_vivienda" role="alert" hidden></p>
+        <div id="wrap_tipo_vivienda_otra" hidden>
+          <label for="tipo_vivienda_otra">Especifique otra vivienda</label>
+          <input id="tipo_vivienda_otra" name="tipo_vivienda_otra">
+          <p class="field-error" id="err_tipo_vivienda_otra" role="alert" hidden></p>
+        </div>
+      </fieldset>
+
+      <!-- Situación laboral y económica -->
+      <fieldset id="sec3" class="card">
+        <legend>Situación laboral y económica</legend>
+
+        <label for="ingreso_promedio_3m">Ingreso promedio 3 meses (≥ 0)</label>
+        <input id="ingreso_promedio_3m" name="ingreso_promedio_3m" inputmode="numeric" min="0" required data-mask="money" placeholder="1.250.000">
+        <p class="field-error" id="err_ingreso_promedio_3m" role="alert" hidden></p>
+
+        <label for="caida_ingresos">Caída de ingresos</label>
+        <select id="caida_ingresos" name="caida_ingresos" required>
+          <option value="">—</option>
+          <option value="mas50">Más del 50%</option>
+          <option value="30a50">30 a 50%</option>
+          <option value="menos30">Menos del 30%</option>
+          <option value="igual">Igual</option>
+        </select>
+        <p class="field-error" id="err_caida_ingresos" role="alert" hidden></p>
+
+        <p>Gastos fijos (máx 3)</p>
+        <label class="choice"><input type="checkbox" name="gastos_fijos" value="alquiler_auto"> Alquiler auto</label>
+        <label class="choice"><input type="checkbox" name="gastos_fijos" value="combustible"> Combustible</label>
+        <label class="choice"><input type="checkbox" name="gastos_fijos" value="seguro_patente"> Seguro/patente</label>
+        <label class="choice"><input type="checkbox" name="gastos_fijos" value="alquiler_casa"> Alquiler casa</label>
+        <label class="choice"><input type="checkbox" name="gastos_fijos" value="alimentos"> Alimentos</label>
+        <label class="choice"><input type="checkbox" name="gastos_fijos" value="medicamentos"> Medicamentos</label>
+        <p id="gastosMsg" role="status"></p>
+        <p class="field-error" id="err_gastos_fijos" role="alert" hidden></p>
+
+        <p>Deudas (<code>ninguna</code> excluyente)</p>
+        <label class="choice"><input type="checkbox" name="deudas" value="alquiler"> Alquiler</label>
+        <label class="choice"><input type="checkbox" name="deudas" value="servicios"> Servicios</label>
+        <label class="choice"><input type="checkbox" name="deudas" value="tarjeta_prestamo"> Tarjeta/préstamo</label>
+        <label class="choice"><input type="checkbox" name="deudas" value="obra_social"> Obra social</label>
+        <label class="choice"><input type="checkbox" name="deudas" value="ninguna"> Ninguna</label>
+      </fieldset>
+
+      <!-- Indicador de urgencia -->
+      <fieldset id="sec4" class="card">
+        <legend>Indicador de urgencia <small>(1=No, 2=A veces, 3=Sí siempre)</small></legend>
+        <p>Dejó de hacer alguna comida por falta de dinero</p>
+        <label class="choice"><input type="radio" name="u_comida" value="1" required> 1</label>
+        <label class="choice"><input type="radio" name="u_comida" value="2"> 2</label>
+        <label class="choice"><input type="radio" name="u_comida" value="3"> 3</label>
+        <p>Eligió entre cargar combustible o comprar alimentos/medicamentos</p>
+        <label class="choice"><input type="radio" name="u_combustible_vs_comida" value="1" required> 1</label>
+        <label class="choice"><input type="radio" name="u_combustible_vs_comida" value="2"> 2</label>
+        <label class="choice"><input type="radio" name="u_combustible_vs_comida" value="3"> 3</label>
+        <p>Familia depende 100% de lo recaudado con el auto</p>
+        <label class="choice"><input type="radio" name="u_depende_auto" value="1" required> 1</label>
+        <label class="choice"><input type="radio" name="u_depende_auto" value="2"> 2</label>
+        <label class="choice"><input type="radio" name="u_depende_auto" value="3"> 3</label>
+        <p>Problema de salud no atendido por costo</p>
+        <label class="choice"><input type="radio" name="u_salud" value="1" required> 1</label>
+        <label class="choice"><input type="radio" name="u_salud" value="2"> 2</label>
+        <label class="choice"><input type="radio" name="u_salud" value="3"> 3</label>
+        <p class="field-error" id="err_urgencia" role="alert" hidden></p>
+        <p class="score-box">Puntaje: <strong id="scoreTotal">—</strong> Nivel: <span class="badge" id="scoreNivel">—</span></p>
+      </fieldset>
+
+      <!-- Asistencia solicitada + cierre -->
+      <fieldset id="sec5" class="card">
+        <legend>Asistencia solicitada + cierre</legend>
+        <p>Asistencia (máx 2)</p>
+        <label class="choice"><input type="checkbox" name="asistencia" value="bono"> Bono</label>
+        <label class="choice"><input type="checkbox" name="asistencia" value="bolson"> Bolsón</label>
+        <label class="choice"><input type="checkbox" name="asistencia" value="kit_gnc"> Kit GNC</label>
+        <label class="choice"><input type="checkbox" name="asistencia" value="patente_seguro"> Patente/seguro</label>
+        <label class="choice"><input type="checkbox" name="asistencia" value="capacitacion"> Capacitación</label>
+        <label class="choice"><input type="checkbox" name="asistencia" value="salud"> Salud</label>
+        <label class="choice"><input type="checkbox" name="asistencia" value="licencia"> Licencia</label>
+        <label class="choice"><input type="checkbox" name="asistencia" value="condonacion"> Condonación</label>
+        <label class="choice"><input type="checkbox" name="asistencia" value="otro"> Otro</label>
+        <p id="asistMsg" role="status"></p>
+        <p class="field-error" id="err_asistencia" role="alert" hidden></p>
+        <div id="wrap_asistencia_otro" hidden>
+          <label for="asistencia_otro">Especifique otra asistencia</label>
+          <input id="asistencia_otro" name="asistencia_otro">
+          <p class="field-error" id="err_asistencia_otro" role="alert" hidden></p>
+        </div>
+
+        <label for="entrevistado_aclaracion">Aclaración entrevistado (firma en papel)</label>
+        <input id="entrevistado_aclaracion" name="entrevistado_aclaracion" required>
+        <p class="field-error" id="err_entrevistado_aclaracion" role="alert" hidden></p>
+
+        <label for="fecha">Fecha</label>
+        <input id="fecha" name="fecha" type="date" required>
+        <p class="field-error" id="err_fecha" role="alert" hidden></p>
+
+        <label for="entrevistador">Entrevistador</label>
+        <input id="entrevistador" name="entrevistador" required>
+        <p class="field-error" id="err_entrevistador" role="alert" hidden></p>
+
+        <label for="lugar">Lugar de relevamiento</label>
+        <input id="lugar" name="lugar" required>
+        <p class="field-error" id="err_lugar" role="alert" hidden></p>
+      </fieldset>
+
+      <p class="form-actions"><button type="submit" id="btnSave">Guardar ficha</button></p>
+    </form>
+  </main>
+  <script src="js/masks.js"></script>
+  <script src="js/cargar.js"></script>
+</body>
+</html>

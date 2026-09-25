@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij48cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IiNmNzk0MWQiLz48dGV4dCB4PSIyIiB5PSIxNCIgZm9udC1zaXplPSIxMSIgZmlsbD0iI2ZmZiI+UjwvdGV4dD48L3N2Zz4K">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tabla — Relevamiento Taxis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.26.1/dist/pocketbase.umd.js" integrity="sha384-hY70gu8Te3sbIOcK/QdlA5ZS1N4wNtUY72G/FvV4hDP9GKsnyBnyo3xd7B12eV6t" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" crossorigin="anonymous"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="cargar.html">
+        <span class="brand-mark">RT</span>
+        <span>Relevamiento Taxis<span class="brand-sub">Gestión de asistencia</span></span>
+      </a>
+      <nav class="mainnav">
+        <a href="cargar.html">Cargar</a>
+        <a href="tabla.html" aria-current="page">Tabla</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#" id="logout" class="nav-logout">Salir</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="pageintro">
+      <h1>Tabla de fichas</h1>
+      <p><small class="confdense">Datos confidenciales. Uso exclusivo para gestión de asistencia.</small></p>
+    </div>
+
+    <form id="filtros" class="card filters-card">
+      <div>
+        <label for="fLoc">Localidad</label>
+        <input id="fLoc" name="localidad" autocomplete="off">
+      </div>
+      <div>
+        <label for="fTipo">Tipo de servicio</label>
+        <select id="fTipo" name="tipo_servicio">
+          <option value="">Todos</option>
+          <option value="taxi">Taxi</option>
+          <option value="remis">Remis</option>
+          <option value="app">App</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div>
+        <label for="fNivel">Nivel</label>
+        <select id="fNivel" name="nivel">
+          <option value="">Todos</option>
+          <option value="bajo">Bajo</option>
+          <option value="medio">Medio</option>
+          <option value="critico">Crítico</option>
+        </select>
+      </div>
+      <div>
+        <label for="fDesde">Fecha desde</label>
+        <input id="fDesde" type="date">
+      </div>
+      <div>
+        <label for="fHasta">Fecha hasta</label>
+        <input id="fHasta" type="date">
+      </div>
+      <div>
+        <label for="fQ">DNI / nombre</label>
+        <input id="fQ" autocomplete="off">
+      </div>
+      <div class="form-actions">
+        <button type="submit">Filtrar</button>
+        <button type="button" class="btn-ghost" id="btnClear">Limpiar</button>
+        <button type="button" id="btnExport">Exportar datos filtrados</button>
+      </div>
+    </form>
+    <p id="tablaMsg" role="status"></p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Fecha</th><th>DNI</th><th>Nombre</th><th>Localidad</th>
+          <th>Servicio</th><th>Nivel</th><th>Puntaje</th><th>Entrevistador</th><th></th>
+        </tr></thead>
+        <tbody id="tablaBody"></tbody>
+      </table>
+    </div>
+    <p class="form-actions">
+      <button type="button" class="btn-ghost" id="btnPrev">‹ Anterior</button>
+      <span id="pageInfo"></span>
+      <button type="button" id="btnNext">Siguiente ›</button>
+    </p>
+  </main>
+  <script src="js/tabla.js"></script>
+  <script src="js/export.js"></script>
+</body>
+</html>
